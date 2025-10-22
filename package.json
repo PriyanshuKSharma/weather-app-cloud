@@ -1,0 +1,12 @@
+{
+  "name": "weather-app-cloud",
+  "version": "1.0.0",
+  "description": "Serverless weather dashboard",
+  "scripts": {
+    "deploy": "cd terraform && terraform init && terraform apply -auto-approve",
+    "destroy": "cd terraform && terraform destroy -auto-approve"
+  },
+  "keywords": ["aws", "lambda", "weather", "serverless"],
+  "author": "",
+  "license": "MIT"
+}
