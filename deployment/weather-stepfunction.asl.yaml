@@ -1,0 +1,31 @@
+Comment: "Weather App Deployment Pipeline"
+StartAt: UpdateLambda
+States:
+  UpdateLambda:
+    Type: Task
+    Resource: arn:aws:states:::lambda:invoke
+    Parameters:
+      FunctionName: weather-deploy-function
+      Payload:
+        action: update_lambda
+    Next: UpdateS3
+    Retry:
+      - ErrorEquals:
+          - States.TaskFailed
+        IntervalSeconds: 2
+        MaxAttempts: 3
+        BackoffRate: 2.0
+  UpdateS3:
+    Type: Task
+    Resource: arn:aws:states:::lambda:invoke
+    Parameters:
+      FunctionName: weather-deploy-function
+      Payload:
+        action: update_s3
+    End: true
+    Retry:
+      - ErrorEquals:
+          - States.TaskFailed
+        IntervalSeconds: 2
+        MaxAttempts: 3
+        BackoffRate: 2.0

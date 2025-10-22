@@ -1,0 +1,99 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Weather App Lambda Functions
+
+Parameters:
+  WeatherApiKey:
+    Type: String
+    Description: OpenWeatherMap API Key
+    NoEcho: true
+  SourceBucket:
+    Type: String
+    Description: S3 bucket for source code
+  WebsiteBucket:
+    Type: String
+    Description: S3 bucket for website hosting
+  ApiUrl:
+    Type: String
+    Description: API Gateway URL
+
+Resources:
+  # Main Weather Function
+  WeatherFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: weather-function
+      Runtime: nodejs18.x
+      Handler: index.handler
+      CodeUri: ../lambda/
+      Environment:
+        Variables:
+          WEATHER_API_KEY: !Ref WeatherApiKey
+      Events:
+        WeatherApi:
+          Type: Api
+          Properties:
+            Path: /weather
+            Method: get
+            Cors:
+              AllowMethods: "'GET,OPTIONS'"
+              AllowHeaders: "'*'"
+              AllowOrigin: "'*'"
+
+  # Deployment Function
+  DeployFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: weather-deploy-function
+      Runtime: nodejs18.x
+      Handler: index.handler
+      CodeUri: ./
+      Timeout: 60
+      Environment:
+        Variables:
+          SOURCE_BUCKET: !Ref SourceBucket
+          WEBSITE_BUCKET: !Ref WebsiteBucket
+          API_URL: !Ref ApiUrl
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - lambda:UpdateFunctionCode
+                - lambda:GetFunction
+                - s3:GetObject
+                - s3:PutObject
+              Resource: '*'
+
+  # Step Function
+  WeatherDeployStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      Name: weather-app-deploy
+      DefinitionUri: weather-stepfunction.asl.yaml
+      DefinitionSubstitutions:
+        DeployFunctionArn: !GetAtt DeployFunction.Arn
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - lambda:InvokeFunction
+              Resource: !GetAtt DeployFunction.Arn
+
+Outputs:
+  WeatherFunctionArn:
+    Description: Weather Function ARN
+    Value: !GetAtt WeatherFunction.Arn
+  
+  DeployFunctionArn:
+    Description: Deploy Function ARN
+    Value: !GetAtt DeployFunction.Arn
+    
+  StateMachineArn:
+    Description: Step Function ARN
+    Value: !GetAtt WeatherDeployStateMachine.Arn
+    
+  ApiUrl:
+    Description: API Gateway URL
+    Value: !Sub 'https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/weather'
