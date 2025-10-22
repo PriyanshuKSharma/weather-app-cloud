@@ -1,0 +1,66 @@
+Comment: Weather App Deployment Workflow
+StartAt: StartDeployment
+States:
+  StartDeployment:
+    Type: Task
+    Resource: arn:aws:lambda:ap-south-1:396907900627:function:weather-deployment-workflow
+    Parameters:
+      step: start
+      weather_api_key.$: $.weather_api_key
+      bucket_name.$: $.bucket_name
+      region.$: $.region
+    Next: ValidateResources
+
+  ValidateResources:
+    Type: Task
+    Resource: arn:aws:lambda:ap-south-1:396907900627:function:weather-deployment-workflow
+    Parameters:
+      step: validate_resources
+      config.$: $.config
+    Next: CheckValidation
+
+  CheckValidation:
+    Type: Choice
+    Choices:
+      - Variable: $.statusCode
+        NumericEquals: 200
+        Next: DeployLambda
+    Default: DeploymentFailed
+
+  DeployLambda:
+    Type: Task
+    Resource: arn:aws:lambda:ap-south-1:396907900627:function:weather-deployment-workflow
+    Parameters:
+      step: deploy_lambda
+      config.$: $.config
+    Next: DeployAPI
+
+  DeployAPI:
+    Type: Task
+    Resource: arn:aws:lambda:ap-south-1:396907900627:function:weather-deployment-workflow
+    Parameters:
+      step: deploy_api
+      config.$: $.config
+    Next: DeployWebsite
+
+  DeployWebsite:
+    Type: Task
+    Resource: arn:aws:lambda:ap-south-1:396907900627:function:weather-deployment-workflow
+    Parameters:
+      step: deploy_website
+      config.$: $.config
+      api_url.$: $.api_url
+    Next: CompleteDeployment
+
+  CompleteDeployment:
+    Type: Task
+    Resource: arn:aws:lambda:ap-south-1:396907900627:function:weather-deployment-workflow
+    Parameters:
+      step: complete
+      api_url.$: $.api_url
+      website_url.$: $.website_url
+    End: true
+
+  DeploymentFailed:
+    Type: Fail
+    Cause: Deployment validation failed
