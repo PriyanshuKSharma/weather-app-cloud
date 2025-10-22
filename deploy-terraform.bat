@@ -35,19 +35,16 @@ if %errorlevel% neq 0 (
 )
 
 echo.
-echo 🔍 Getting API Gateway URL...
+echo 🔍 Getting URLs...
 for /f "tokens=*" %%i in ('terraform output -raw api_url') do set API_URL=%%i
+for /f "tokens=*" %%i in ('terraform output -raw website_url') do set WEBSITE_URL=%%i
 cd ..
-
-echo.
-echo 📝 Updating index.html...
-powershell -Command "(Get-Content index.html) -replace 'YOUR_API_GATEWAY_URL_HERE', '%API_URL%' | Set-Content index.html"
 
 echo.
 echo ✅ Terraform deployment complete!
 echo 🌐 API URL: %API_URL%
-echo 🌐 Test: %API_URL%?city=London
-echo 📱 Open index.html in your browser
+echo 🌐 Website URL: %WEBSITE_URL%
+echo 🌐 Test API: %API_URL%?city=London
 echo.
 echo To destroy: terraform destroy
 pause
