@@ -21,6 +21,12 @@ weather-app-cloud/
 │   └── deploy-terraform.bat   # Windows deployment script
 ├── lambda/
 │   └── weather-function.js    # AWS Lambda function
+├── step-function/
+│   ├── weather_deployment_workflow.py  # Python Step Function
+│   └── step_function_definition.json   # State machine definition
+├── images/
+│   ├── lambda-template.png    # Lambda function template
+│   └── stepfunctions_graph.png # Step Functions workflow diagram
 ├── index.html                 # Frontend dashboard
 ├── deployment-guide.md        # Step-by-step deployment
 └── README.md                  # This file
@@ -31,6 +37,12 @@ weather-app-cloud/
 ```
 User → HTML/JS Frontend → API Gateway → Lambda → OpenWeatherMap API
 ```
+
+### Step Functions Workflow
+![Step Functions Workflow](images/stepfunctions_graph.png)
+
+### Lambda Template
+![Lambda Template](images/lambda-template.png)
 
 ## 📋 Features
 
