@@ -4,6 +4,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.1"
+    }
   }
 }
 
@@ -21,6 +25,12 @@ variable "weather_api_key" {
   description = "OpenWeatherMap API key"
   type        = string
   sensitive   = true
+}
+
+variable "bucket_name" {
+  description = "S3 bucket name for website hosting"
+  type        = string
+  default     = ""
 }
 
 # IAM Role for Lambda
@@ -112,8 +122,68 @@ resource "aws_lambda_permission" "api_gateway" {
   source_arn    = "${aws_apigatewayv2_api.weather_api.execution_arn}/*/*"
 }
 
+# S3 Bucket for hosting
+resource "aws_s3_bucket" "website" {
+  bucket = "weather-app-${random_string.bucket_suffix.result}"
+}
+
+resource "random_string" "bucket_suffix" {
+  length  = 8
+  special = false
+  upper   = false
+}
+
+resource "aws_s3_bucket_website_configuration" "website" {
+  bucket = aws_s3_bucket.website.id
+
+  index_document {
+    suffix = "index.html"
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "website" {
+  bucket = aws_s3_bucket.website.id
+
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
+}
+
+resource "aws_s3_bucket_policy" "website" {
+  bucket = aws_s3_bucket.website.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid       = "PublicReadGetObject"
+        Effect    = "Allow"
+        Principal = "*"
+        Action    = "s3:GetObject"
+        Resource  = "${aws_s3_bucket.website.arn}/*"
+      }
+    ]
+  })
+
+  depends_on = [aws_s3_bucket_public_access_block.website]
+}
+
+# Upload index.html with API URL
+resource "aws_s3_object" "index" {
+  bucket       = aws_s3_bucket.website.id
+  key          = "index.html"
+  content      = replace(file("../index.html"), "YOUR_API_GATEWAY_URL_HERE", "${aws_apigatewayv2_api.weather_api.api_endpoint}/weather")
+  content_type = "text/html"
+}
+
 # Outputs
 output "api_url" {
   description = "Weather API URL"
   value       = "${aws_apigatewayv2_api.weather_api.api_endpoint}/weather"
+}
+
+output "website_url" {
+  description = "Website URL"
+  value       = "http://${aws_s3_bucket_website_configuration.website.website_endpoint}"
 }
