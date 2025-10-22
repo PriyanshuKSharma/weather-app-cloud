@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Weather Dashboard</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background: linear-gradient(135deg, #74b9ff, #0984e3);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #2d3436;
+            margin-bottom: 30px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+        }
+        input {
+            padding: 12px;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            width: 200px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 12px 20px;
+            font-size: 16px;
+            background: #0984e3;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #74b9ff;
+        }
+        #result {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+        .weather-info {
+            font-size: 18px;
+            margin: 10px 0;
+        }
+        .error {
+            color: #e74c3c;
+            background: #ffeaa7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>☁️ Cloud Weather Dashboard</h1>
+        <div class="input-group">
+            <input type="text" id="cityInput" placeholder="Enter city name" />
+            <button onclick="getWeather()">Get Weather</button>
+        </div>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const API_URL = 'YOUR_API_GATEWAY_URL_HERE'; // Replace with your API Gateway URL
+
+        async function getWeather() {
+            const city = document.getElementById('cityInput').value.trim();
+            const resultDiv = document.getElementById('result');
+            
+            if (!city) {
+                showError('Please enter a city name');
+                return;
+            }
+
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<p>Loading...</p>';
+
+            try {
+                const response = await fetch(`${API_URL}?city=${encodeURIComponent(city)}`);
+                const data = await response.json();
+
+                if (response.ok) {
+                    resultDiv.className = '';
+                    resultDiv.innerHTML = `
+                        <h2>🌍 ${data.city}</h2>
+                        <div class="weather-info">🌡️ Temperature: ${data.temperature}°C</div>
+                        <div class="weather-info">☁️ Condition: ${data.weather}</div>
+                        <div class="weather-info">💧 Humidity: ${data.humidity}%</div>
+                        <div class="weather-info">💨 Wind Speed: ${data.windSpeed} m/s</div>
+                    `;
+                } else {
+                    showError(data.error || 'Failed to fetch weather data');
+                }
+            } catch (error) {
+                showError('Network error. Please check your connection.');
+            }
+        }
+
+        function showError(message) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.className = 'error';
+            resultDiv.innerHTML = `<p>❌ ${message}</p>`;
+        }
+
+        // Allow Enter key to trigger search
+        document.getElementById('cityInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                getWeather();
+            }
+        });
+    </script>
+</body>
+</html>
