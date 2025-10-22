@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "Serverless weather dashboard",
   "scripts": {
-    "deploy": "cd terraform && terraform init && terraform apply -auto-approve",
-    "destroy": "cd terraform && terraform destroy -auto-approve"
+    "deploy": "cd deployment\\terraform && terraform init && terraform apply -auto-approve",
+    "destroy": "cd deployment\\terraform && terraform destroy -auto-approve",
+    "auto-deploy": "node deployment\\auto-deploy.js"
   },
   "keywords": ["aws", "lambda", "weather", "serverless"],
   "author": "",

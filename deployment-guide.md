@@ -10,10 +10,10 @@
 ### Deploy
 ```bash
 # Windows
-deploy-terraform.bat
+deployment\deploy-terraform.bat
 
 # Or direct Terraform
-cd terraform
+cd deployment\terraform
 terraform init
 terraform apply
 
@@ -23,7 +23,7 @@ npm run deploy
 
 ### Destroy
 ```bash
-cd terraform
+cd deployment\terraform
 terraform destroy
 # or
 npm run destroy

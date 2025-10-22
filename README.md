@@ -14,6 +14,11 @@ A serverless weather application using AWS Lambda, API Gateway, and OpenWeatherM
 
 ```
 weather-app-cloud/
+├── deployment/
+│   ├── terraform/             # Terraform infrastructure
+│   ├── auto-deploy.js         # Automated deployment script
+│   ├── deploy-lambda.js       # Step Function Lambda
+│   └── deploy-terraform.bat   # Windows deployment script
 ├── lambda/
 │   └── weather-function.js    # AWS Lambda function
 ├── index.html                 # Frontend dashboard
