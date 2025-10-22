@@ -1,0 +1,8 @@
+{
+  "name": "weather-deploy-function",
+  "version": "1.0.0",
+  "dependencies": {
+    "aws-sdk": "^2.1691.0",
+    "archiver": "^7.0.1"
+  }
+}
