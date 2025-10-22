@@ -9,18 +9,25 @@ def lambda_handler(event, context):
     
     step = event.get('step', 'start')
     
-    if step == 'start':
-        return start_deployment(event)
-    elif step == 'validate_resources':
-        return validate_resources(event)
-    elif step == 'deploy_lambda':
-        return deploy_lambda(event)
-    elif step == 'deploy_api':
-        return deploy_api_gateway(event)
-    elif step == 'deploy_website':
-        return deploy_website(event)
-    elif step == 'complete':
-        return complete_deployment(event)
+    try:
+        if step == 'start':
+            return start_deployment(event)
+        elif step == 'validate_resources':
+            return validate_resources(event)
+        elif step == 'deploy_lambda':
+            return deploy_lambda(event)
+        elif step == 'deploy_api':
+            return deploy_api_gateway(event)
+        elif step == 'deploy_website':
+            return deploy_website(event)
+        elif step == 'complete':
+            return complete_deployment(event)
+    except Exception as e:
+        return {
+            'statusCode': 500,
+            'step': 'error',
+            'message': f'Workflow error: {str(e)}'
+        }
 
 def start_deployment(event):
     """Initialize deployment workflow"""
