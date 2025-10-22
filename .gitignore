@@ -1,0 +1,18 @@
+# Terraform
+.terraform/
+.terraform.lock.hcl
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/*.zip
+
+# AWS
+.aws/
+
+# Node modules
+node_modules/
+
+# Environment variables
+.env
+.env.local
