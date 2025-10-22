@@ -16,3 +16,7 @@ node_modules/
 # Environment variables
 .env
 .env.local
+.env.*.local
+
+response.json
+weather-function.zip
