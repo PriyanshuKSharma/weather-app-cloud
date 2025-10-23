@@ -21,6 +21,7 @@ exports.handler = async (event) => {
     }
 };
 
+
 async function updateLambdaFunction() {
     const sourceKey = 'weather-function.js';
     const sourceBucket = process.env.SOURCE_BUCKET;

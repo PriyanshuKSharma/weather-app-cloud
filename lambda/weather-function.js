@@ -1,7 +1,7 @@
 const https = require('https');
 
 exports.handler = async (event) => {
-    const city = event.queryStringParameters?.city || "London";
+    const city = event.queryStringParameters?.city || "Pune";
     const apiKey = process.env.WEATHER_API_KEY;
     
     if (!apiKey) {
